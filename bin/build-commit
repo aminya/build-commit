@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+const {program} = require('commander')
+const colors = require('colors')
+const shell = require('shelljs')
+
+console.log('Welcome to build-commit'.cyan);
+
+program.version('0.1.0')
+
+program
+    .option('-d, --directory <directory>',
+        'Root of the git directory',
+        '.')
+    .option('-o, --output <directory>',
+        'Build destination folder',
+        'dist')
+    .option('-m --message <message>',
+        'If provided does not run post-command',
+        'chore: add built files')
+    .option('-pre, --precommand <command>',
+        'Execute a shell command before committing.',
+        'npm run build')
+    .option('-post, --postcommand <command>',
+        'Execute a shell command after committing.')
+    .option('--nopre',
+        'If provided does not run pre-command')
+    .option('--nopost',
+        'If provided does not run post-command')
+
+
+program.parse(process.argv)
+
+
+if (program.directory !== ".") {
+    shell.cd(program.directory)
+    console.log(`directory changed to ${program.directory}`.yellow)
+}
+
+if (!shell.test('-f', '.gitignore')) {
+    shell.touch('.gitignore')
+    console.log('.gitignore was created'.yellow)
+}
+
+const ignore_hasdir = shell.grep(program.output, '.gitignore')
+if (!ignore_hasdir) {
+    shell.echo(program.output).toEnd('.gitignore');
+    console.log(`${program.output} was added to .gitignore`.yellow)
+}
+
+shell.mv('.gitignore', '.gitignore.back')
+if (!program.nopre) {
+    console.log('running precommand'.blue)
+    shell.exec(program.precommand)
+}
+shell.exec(`git add -- ${program.output}`)
+shell.exec(`git commit -m \"${program.message}\" -- ${program.output}`)
+shell.mv('.gitignore.back', '.gitignore')
+shell.cd(program.output)
+shell.exec('git ls-files -z | xargs -0 git update-index --assume-unchanged')
+shell.cd(program.directory)
+if (!program.nopost && program.postcommand) {
+    console.log('running postcommand'.blue)
+    shell.exec(program.postcommand)
+}
+
+console.log("build-commit finished".blue)
