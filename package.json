@@ -1,0 +1,26 @@
+{
+  "name": "build-commit",
+  "version": "0.1.0",
+  "description": "Commit built files without polluting git",
+  "bin": {
+    "build-commit": "bin/build-commit"
+  },
+  "keywords": [
+    "build",
+    "commit",
+    "prebulish",
+    "ppublish",
+    "prepare",
+    "git"
+  ],
+  "dependencies": {
+    "commander": "^5.1.0",
+    "shelljs": "^0.8.4",
+    "colors": "^1.4.0"
+  },
+  "author": "Amin Yahyaabadi",
+  "license": "MIT",
+  "engines": {
+    "node": ">=6"
+  }
+}
