@@ -61,7 +61,8 @@ shell.mv('.gitignore.back', '.gitignore')
 shell.cd(program.output)
 
 if (process.platform == 'win32') {
-    child_process.execSync(`git ls-files -z | ${path.resolve("./xargs.cmd")} -0 git update-index --assume-unchanged`)
+
+    child_process.execSync(`git ls-files -z | ${path.join(__dirname, "xargs.cmd")} -0 git update-index --assume-unchanged`, {stdio: 'inherit'})
 } else {
     shell.exec('git ls-files -z | xargs -0 git update-index --assume-unchanged')
 }
