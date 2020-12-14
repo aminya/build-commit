@@ -3,6 +3,8 @@
 const {program} = require('commander')
 const colors = require('colors')
 const shell = require('shelljs')
+const path = require('path')
+const child_process = require('child_process')
 
 console.log('Running build-commit:'.cyan);
 
@@ -57,8 +59,15 @@ shell.exec(`git add -- ${program.output}`)
 shell.exec(`git commit -m \"${program.message}\" -- ${program.output}`)
 shell.mv('.gitignore.back', '.gitignore')
 shell.cd(program.output)
-shell.exec('git ls-files -z | xargs -0 git update-index --assume-unchanged')
+
+if (process.platform == 'win32') {
+    child_process.execSync(`git ls-files -z | ${path.resolve("./xargs.cmd")} -0 git update-index --assume-unchanged`)
+} else {
+    shell.exec('git ls-files -z | xargs -0 git update-index --assume-unchanged')
+}
+
 shell.cd(program.directory)
+
 if (!program.nopost && program.postcommand) {
     console.log('running postcommand'.blue)
     shell.exec(program.postcommand)
