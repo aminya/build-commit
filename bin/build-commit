@@ -53,7 +53,7 @@ if (!ignore_hasdir) {
 shell.mv('.gitignore', '.gitignore.back')
 if (!program.nopre) {
     console.log('running precommand'.blue)
-    shell.exec(program.precommand)
+    child_process.execSync(program.precommand)
 }
 shell.exec(`git add -- ${program.output}`)
 shell.exec(`git commit -m \"${program.message}\" -- ${program.output}`)
@@ -70,7 +70,7 @@ shell.cd(program.directory)
 
 if (!program.nopost && program.postcommand) {
     console.log('running postcommand'.blue)
-    shell.exec(program.postcommand)
+    child_process.execSync(program.postcommand)
 }
 
 console.log("build-commit finished".blue)
