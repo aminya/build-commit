@@ -1,6 +1,6 @@
 {
   "name": "build-commit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Commit built files without polluting git",
   "bin": {
     "build-commit": "bin/build-commit"
