@@ -14,7 +14,7 @@
     "git"
   ],
   "dependencies": {
-    "commander": "^6.2.1",
+    "commander": "^7.0.0",
     "shelljs": "^0.8.4",
     "colors": "^1.4.0"
   },
