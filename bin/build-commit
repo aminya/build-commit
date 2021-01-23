@@ -3,6 +3,7 @@
 const {program} = require('commander')
 const colors = require('colors')
 const shell = require('shelljs')
+const {resolve} = require('path')
 
 console.log('Running build-commit:'.cyan);
 
@@ -32,9 +33,10 @@ program
 program.parse(process.argv)
 const options = program.opts()
 
-if (options.directory !== ".") {
-    shell.cd(options.directory)
-    console.log(`directory changed to ${options.directory}`.yellow)
+const rootPath = resolve(options.directory)
+if (rootPath !== resolve(".")) {
+    shell.cd(rootPath)
+    console.log(`directory changed to ${rootPath}`.yellow)
 }
 
 if (!shell.test('-f', '.gitignore')) {
@@ -53,16 +55,18 @@ if (!options.nopre) {
     console.log('running precommand'.blue)
     shell.exec(options.precommand)
 }
+
 shell.exec(`git add -- ${options.output}`)
 shell.exec(`git commit -m \"${options.message}\" -- ${options.output}`)
 shell.mv('.gitignore.back', '.gitignore')
 
+// hide after committing
 shell.cd(options.output)
-const changedFiles = shell.exec('git ls-files').stdout.split('\n')
-for (const changedFile of changedFiles) {
-    shell.exec(`git update-index --assume-unchanged -- ${changedFile}`)
+const changedFilesAfter = shell.exec('git ls-files').stdout.split('\n')
+for (const changedFile of changedFilesAfter) {
+    shell.exec(`git update-index --assume-unchange -- ${changedFile}`)
 }
-shell.cd(options.directory)
+shell.cd(rootPath)
 
 if (!options.nopost && options.postcommand) {
     console.log('running postcommand'.blue)
