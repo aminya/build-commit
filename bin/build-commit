@@ -34,6 +34,8 @@ program.parse(process.argv)
 const options = program.opts()
 
 const rootPath = resolve(options.directory)
+const outputPath = resolve(options.output)
+
 if (rootPath !== resolve(".")) {
     shell.cd(rootPath)
     console.log(`directory changed to ${rootPath}`.yellow)
@@ -44,10 +46,10 @@ if (!shell.test('-f', '.gitignore')) {
     console.log('.gitignore was created'.yellow)
 }
 
-const ignore_hasdir = shell.grep(options.output, '.gitignore')
+const ignore_hasdir = shell.grep(outputPath, '.gitignore')
 if (!ignore_hasdir) {
-    shell.echo(options.output).toEnd('.gitignore');
-    console.log(`${options.output} was added to .gitignore`.yellow)
+    shell.echo(outputPath).toEnd('.gitignore');
+    console.log(`${outputPath} was added to .gitignore`.yellow)
 }
 
 shell.mv('.gitignore', '.gitignore.back')
@@ -56,12 +58,12 @@ if (!options.nopre) {
     shell.exec(options.precommand)
 }
 
-shell.exec(`git add -- ${options.output}`)
-shell.exec(`git commit -m \"${options.message}\" -- ${options.output}`)
+shell.exec(`git add -- ${outputPath}`)
+shell.exec(`git commit -m \"${options.message}\" -- ${outputPath}`)
 shell.mv('.gitignore.back', '.gitignore')
 
 // hide after committing
-shell.cd(options.output)
+shell.cd(outputPath)
 const changedFilesAfter = shell.exec('git ls-files').stdout.split('\n')
 for (const changedFile of changedFilesAfter) {
     shell.exec(`git update-index --assume-unchange -- ${changedFile}`)
