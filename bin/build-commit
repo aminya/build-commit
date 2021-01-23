@@ -30,11 +30,11 @@ program
 
 
 program.parse(process.argv)
+const options = program.opts()
 
-
-if (program.directory !== ".") {
-    shell.cd(program.directory)
-    console.log(`directory changed to ${program.directory}`.yellow)
+if (options.directory !== ".") {
+    shell.cd(options.directory)
+    console.log(`directory changed to ${options.directory}`.yellow)
 }
 
 if (!shell.test('-f', '.gitignore')) {
@@ -42,26 +42,26 @@ if (!shell.test('-f', '.gitignore')) {
     console.log('.gitignore was created'.yellow)
 }
 
-const ignore_hasdir = shell.grep(program.output, '.gitignore')
+const ignore_hasdir = shell.grep(options.output, '.gitignore')
 if (!ignore_hasdir) {
-    shell.echo(program.output).toEnd('.gitignore');
-    console.log(`${program.output} was added to .gitignore`.yellow)
+    shell.echo(options.output).toEnd('.gitignore');
+    console.log(`${options.output} was added to .gitignore`.yellow)
 }
 
 shell.mv('.gitignore', '.gitignore.back')
-if (!program.nopre) {
+if (!options.nopre) {
     console.log('running precommand'.blue)
-    shell.exec(program.precommand)
+    shell.exec(options.precommand)
 }
-shell.exec(`git add -- ${program.output}`)
-shell.exec(`git commit -m \"${program.message}\" -- ${program.output}`)
+shell.exec(`git add -- ${options.output}`)
+shell.exec(`git commit -m \"${options.message}\" -- ${options.output}`)
 shell.mv('.gitignore.back', '.gitignore')
-shell.cd(program.output)
+shell.cd(options.output)
 shell.exec('git ls-files -z | xargs -0 git update-index --assume-unchanged')
-shell.cd(program.directory)
-if (!program.nopost && program.postcommand) {
+shell.cd(options.directory)
+if (!options.nopost && options.postcommand) {
     console.log('running postcommand'.blue)
-    shell.exec(program.postcommand)
+    shell.exec(options.postcommand)
 }
 
 console.log("build-commit finished".blue)
