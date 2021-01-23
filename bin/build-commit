@@ -56,9 +56,14 @@ if (!options.nopre) {
 shell.exec(`git add -- ${options.output}`)
 shell.exec(`git commit -m \"${options.message}\" -- ${options.output}`)
 shell.mv('.gitignore.back', '.gitignore')
+
 shell.cd(options.output)
-shell.exec('git ls-files -z | xargs -0 git update-index --assume-unchanged')
+const changedFiles = shell.exec('git ls-files').stdout.split('\n')
+for (const changedFile of changedFiles) {
+    shell.exec(`git update-index --assume-unchanged -- ${changedFile}`)
+}
 shell.cd(options.directory)
+
 if (!options.nopost && options.postcommand) {
     console.log('running postcommand'.blue)
     shell.exec(options.postcommand)
